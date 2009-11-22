@@ -1,0 +1,79 @@
+#
+# Shell functions to act as wrapper for Ian Bicking's virtualenv
+# (http://pypi.python.org/pypi/virtualenv)
+#
+
+#TODO
+# - Going to have to look at the possibility of putting the current active
+#   environments names somewhere which opens up the possibility of deactivating
+#   and lets me stop people from deleting active environments and activating
+#   something twice. Can also get it into the prompt somehow
+# - existence of .modulebuildrc in a directory means its an environment
+
+
+# Make sure there is a default value for WORKON_HOME.
+# You can override this setting in your .bashrc.
+if [ "$LOCAL_LIB_HOME" = "" ]
+then
+    export LOCAL_LIB_HOME="$HOME/.perl-environments"
+fi
+
+# Normalize the directory name in case it includes 
+# relative path components.
+LOCAL_LIB_HOME=$(sh -c 'cd "$LOCAL_LIB_HOME"; pwd')
+export LOCAL_LIB_HOME
+
+# Verify that the local lib home exists
+function local-lib_verify_home () {
+    if [ ! -d "$LOCAL_LIB_HOME" ]
+    then
+        echo "ERROR: local lib environments directory '$LOCAL_LIB_HOME' does not exist." >&2
+        return 1
+    fi
+    return 0
+}
+
+# Verify that the named environment in the local lib home exists
+function local-lib_verify_home_environment () {
+    typeset env_name="$1"
+    if [ ! -d "$LOCAL_LIB_HOME/$env_name" ]
+    then
+        echo "ERROR: Environment '$env_name' does not exist." >&2
+        return 1
+    fi
+    return 0
+}
+
+# Create a new environment in local lib home
+function local-lib_mkenv () {
+    eval "envname=\\$$#"
+    local-lib_verify_home || return 1
+    # INCOMPLETE
+}
+
+# Remove an existing environment from local lib home
+function local-lib_rmenv () {
+    typeset env_name="$1"
+    local-lib_verify_home || return 1
+    if [ "$env_name"  = "" ]
+    then
+        echo "Please specify an environment." >&2
+        return 1
+    fi
+    
+    local-lib_verify_home_environment $env_name || return 1
+    env_dir="$LOCAL_LIB_HOME/$env_name"
+
+    # check here if its the active environment somehow
+    
+    rm -rf "$env_dir"
+}
+
+# Activate a named environment
+function local-lib_workon () {
+    typeset env_name="$1"
+    if [ "$env_name" = "" ]
+    then
+        
+}
+

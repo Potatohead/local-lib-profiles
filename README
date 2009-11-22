@@ -1,0 +1,4 @@
+local-lib-wrapper
+
+In the spirit of virtualenvwrapper, local lib needs some wrapper scripts to make
+it more usable. 
