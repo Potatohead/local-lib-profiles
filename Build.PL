@@ -7,6 +7,11 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => q{Christopher Mckay <potatohead@potatolan.com>},
     dist_version_from   => 'lib/local/lib/environment.pm',
+    requires => {
+        'local::lib' => 0,
+        'autodie' => 0,
+        'Params::Validate' => 0,
+    },
     build_requires => {
         'Test::More' => 0,
     },
