@@ -31,20 +31,20 @@ deactivate () {
 # unset irrelavent variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/potato/.virtualenvs/test"
-export VIRTUAL_ENV
+PERL_ENV="__PERL_ENV__"
+export PERL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
-PATH="$VIRTUAL_ENV/bin:$PATH"
+PATH="$PERL_ENV/bin:$PATH"
 export PATH
 
 _OLD_VIRTUAL_PS1="$PS1"
-if [ "`basename \"$VIRTUAL_ENV\"`" = "__" ] ; then
+if [ "`basename \"$PERL_ENV\"`" = "__" ] ; then
     # special case for Aspen magic directories
     # see http://www.zetadev.com/software/aspen/
-    PS1="[`basename \`dirname \"$VIRTUAL_ENV\"\``] $PS1"
+    PS1="[`basename \`dirname \"$PERL_ENV\"\``] $PS1"
 else
-    PS1="(`basename \"$VIRTUAL_ENV\"`)$PS1"
+    PS1="(`basename \"$PERL_ENV\"`)$PS1"
 fi
 export PS1
 

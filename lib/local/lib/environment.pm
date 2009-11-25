@@ -6,6 +6,7 @@ use Params::Validate qw/validate
                         SCALAR/;
 use local::lib;
 use File::Copy;
+use File::Path;
 use autodie;
 use Carp;
 
@@ -55,7 +56,7 @@ sub make_environment {
     local::lib->ensure_dir_structure_for($args{directory});
 
     # then upgrade it to a local lib environment
-    upgrade_to_environment($args{directory});
+    upgrade_to_environment(directory => $args{directory});
 
 } # end of subroutine make_environment
 

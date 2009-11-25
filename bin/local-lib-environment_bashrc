@@ -50,9 +50,9 @@ function local-lib_show_workon_options () {
 
 # Create a new environment in local lib home
 function local-lib_mkenv () {
-    eval "envname=\\$$#"
+    eval "envname=\$$#"
     local-lib_verify_home || return 1
-    # INCOMPLETE
+    perl -e "use local::lib::environment; print local::lib::environment::make_environment(directory => '$LOCAL_LIB_HOME/$envname');"
 }
 
 # Remove an existing environment from local lib home
