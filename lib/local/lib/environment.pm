@@ -135,7 +135,7 @@ export PS1
 # past commands the $PATH changes we made may not be respected
 if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
     hash -r
-fi|
+fi|;
 
     close $activate_fh;
 } # end of subroutine upgrade_to_environment
