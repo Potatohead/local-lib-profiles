@@ -39,6 +39,15 @@ function local-lib_verify_home_environment () {
     return 0
 }
 
+# List the available environments.
+function local-lib_show_workon_options () {
+    local-lib_verify_home  || return 1
+    # NOTE: DO NOT use ls here because colorized versions spew control characters
+    #       into the output list.
+    # echo seems a little faster than find, even with -depth 3.
+    (cd "$LOCAL_LIB_HOME"; for f in */.modulebuildrc; do echo $f; done) | sed 's|^\./||' | sed 's|/.modulebuildrc||' | sort
+}
+
 # Create a new environment in local lib home
 function local-lib_mkenv () {
     eval "envname=\\$$#"
@@ -69,6 +78,11 @@ function local-lib_workon () {
     typeset env_name="$1"
     if [ "$env_name" = "" ]
     then
-        
+        # Return the list of available environments
+        local-lib_show_workon_options
+        return 1
+    fi
+
+    eval $(perl -Mlocal::lib=$LOCAL_LIB_HOME/$env_name)
 }
 
