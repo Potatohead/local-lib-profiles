@@ -1,0 +1,26 @@
+---
+name: local-lib-environment
+version: 0.01
+author:
+  - 'Christopher Mckay <potatohead@potatolan.com>'
+abstract: module catchphrase
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  File::Util: 0
+  Params::Validate: 0
+  autodie: 0
+  local::lib: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  local::lib::environment:
+    file: lib/local/lib/environment.pm
+    version: 0.01
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

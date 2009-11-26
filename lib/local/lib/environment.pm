@@ -140,8 +140,6 @@ perldoc local::lib::environment
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Christopher Mckay.
-
 Copyright Doug Hellmann, All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and its
@@ -151,6 +149,8 @@ both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Doug Hellmann not be used
 in advertising or publicity pertaining to distribution of the software
 without specific, written prior permission.
+
+Copyright 2009 Christopher Mckay.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
