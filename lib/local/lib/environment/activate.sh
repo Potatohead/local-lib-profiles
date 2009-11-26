@@ -61,9 +61,15 @@ else
 fi
 export PS1
 
-_OLD_MODULEBUILDRC="$MODULEBUILRC"
-_OLD_PERL_MM_OPT="PERL_MM_OPT"
-_OLD_PERL5LIB="PERL5LIB"
+_OLD_MODULEBUILDRC="$MODULEBUILDRC"
+export _OLD_MODULEBUILDRC
+_OLD_PERL_MM_OPT="$PERL_MM_OPT"
+export _OLD_PERL_MM_OPT
+_OLD_PERL5LIB="$PERL5LIB"
+export _OLD_PERL5LIB
+
+
+eval $( perl -Mlocal::lib=$PERL_ENV)
 
 # This should detect bash and zsh, which have a hash command that must
 # be called to get it to forget past commands.  Without forgetting
