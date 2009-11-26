@@ -13,7 +13,7 @@ use Carp;
 
 =head1 NAME
 
-local::lib::environment - module catchphrase
+local::lib::environment - makes modules feel at home
 
 =head1 VERSION
 
@@ -32,9 +32,46 @@ describe the module, working code example
 
 =head1 DESCRIPTION
 
+local::lib::environment is designed to extend upon the methodologies of
+lib::local to make it simpler to create, manage, and discard local perl
+environments. 
+
 =cut
 
-=head1 FUNCTIONS
+=head1 COMMANDS
+
+These are the cmd line usages for the package
+
+=cut
+
+=head2 local-lib_mkenv
+
+This will create an environment under the LOCAL_LIB_HOME directory by the given
+name.
+
+=cut
+
+=head2 local-lib_rmenv
+
+This will remove an environment that lives under the LOCAL_LIB_HOME directory 
+by the given name.
+
+=cut
+
+=head2 local-lib_workon
+
+This will activate a previously created environment.
+
+=cut
+
+=head2 local-lib_deactivate
+
+This will deactivate the currently active environment. Note that this is only
+available if an environment is active
+
+=cut
+
+=head1 ROUTINES
 
 =cut
 
@@ -89,7 +126,6 @@ sub find_activate_script {
 } # end of subroutine find_activate_script
 
 
-
 =head2 upgrade_to_environment
 
 Upgrades a local lib directory into a full environment
@@ -121,7 +157,6 @@ sub upgrade_to_environment {
     );
 
 } # end of subroutine upgrade_to_environment
-
 
 
 =head1 AUTHOR

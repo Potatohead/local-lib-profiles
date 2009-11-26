@@ -13,6 +13,16 @@ To install this module, run the following commands:
 	./Build test
 	./Build install
 
+After installation, to make your environment ready:-
+
+1.  Add 2 lines to you bashrc to set where your environments will be stored and
+    import the functions supplied by this package
+        
+        export LOCAL_LIB_HOME=$HOME/.perl-environments
+        source /usr/local/bin/local-lib-environment_bashrc
+
+2.  Run ``source ~/.bashrc`` 
+
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
