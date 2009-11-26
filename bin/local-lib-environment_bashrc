@@ -83,6 +83,26 @@ function local-lib_workon () {
         return 1
     fi
 
-    eval $(perl -Mlocal::lib=$LOCAL_LIB_HOME/$env_name)
+    local-lib_verify_home || return 1
+    local-lib_verify_home_environment || return 1
+
+    activate="$LOCAL_LIB_HOME/$env_name/bin/local-lib_activate"
+
+    if [ ! -f "$activate" ]
+    then
+        echo "ERROR: Environment '$WORKON_HOME/$env_name' does not contain an activate script." >&2
+        return 1
+    fi
+
+    # Deactivate any current environment "destructively"
+    # before switching so we use our override function,
+    # if it exists.
+    type local-lib_deactivate >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+        local-lib_deactivate
+    fi
+    
+    source "$activate"
 }
 

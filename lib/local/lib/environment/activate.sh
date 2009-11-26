@@ -39,12 +39,12 @@ local-lib_deactivate () {
     unset PERL_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
-        unset local-lib_deactivate
+        unset -f local-lib_deactivate
     fi
 }
 
 # unset irrelavent variables
-deactivate nondestructive
+local-lib_deactivate nondestructive
 
 PERL_ENV="__PERL_ENV__"
 export PERL_ENV
