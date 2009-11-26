@@ -2,10 +2,25 @@
 # you cannot run it directly
 
 deactivate () {
-    if [ -n "$_OLD_VIRTUAL_PATH" ] ; then
-        PATH="$_OLD_VIRTUAL_PATH"
+    if [ -n "$_OLD_PATH" ] ; then
+        PATH="$_OLD_PATH"
         export PATH
-        unset _OLD_VIRTUAL_PATH
+        unset _OLD_PATH
+    fi
+    if [ -n "$_OLD_MODULEBUILDRC" ] ; then
+        MODULEBUILDRC="$_OLD_MODULEBUILDRC"
+        export MODULEBUILDRC
+        unset _OLD_MODULEBUILDRC
+    fi
+    if [ -n "$_OLD_PERL_MM_OPT" ] ; then
+        PERL_MM_OPT="$_OLD_PERL_MM_OPT"
+        export PERL_MM_OPT
+        unset _OLD_PERL_MM_OPT
+    fi
+    if [ -n "$_OLD_PERL5LIB" ] ; then
+        PERL5LIB="$_OLD_PERL5LIB"
+        export PERL5LIB
+        unset _OLD_PERL5LIB
     fi
 
     # This should detect bash and zsh, which have a hash command that must
@@ -15,13 +30,13 @@ deactivate () {
         hash -r
     fi
 
-    if [ -n "$_OLD_VIRTUAL_PS1" ] ; then
-        PS1="$_OLD_VIRTUAL_PS1"
+    if [ -n "$_OLD_PS1" ] ; then
+        PS1="$_OLD_PS1"
         export PS1
-        unset _OLD_VIRTUAL_PS1
+        unset _OLD_PS1
     fi
 
-    unset VIRTUAL_ENV
+    unset PERL_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
         unset deactivate
@@ -34,11 +49,9 @@ deactivate nondestructive
 PERL_ENV="__PERL_ENV__"
 export PERL_ENV
 
-_OLD_VIRTUAL_PATH="$PATH"
-PATH="$PERL_ENV/bin:$PATH"
-export PATH
+_OLD_PATH="$PATH"
 
-_OLD_VIRTUAL_PS1="$PS1"
+_OLD_PS1="$PS1"
 if [ "`basename \"$PERL_ENV\"`" = "__" ] ; then
     # special case for Aspen magic directories
     # see http://www.zetadev.com/software/aspen/
@@ -47,6 +60,10 @@ else
     PS1="(`basename \"$PERL_ENV\"`)$PS1"
 fi
 export PS1
+
+_OLD_MODULEBUILDRC="$MODULEBUILRC"
+_OLD_PERL_MM_OPT="PERL_MM_OPT"
+_OLD_PERL5LIB="PERL5LIB"
 
 # This should detect bash and zsh, which have a hash command that must
 # be called to get it to forget past commands.  Without forgetting

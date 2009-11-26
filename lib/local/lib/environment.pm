@@ -7,6 +7,7 @@ use Params::Validate qw/validate
 use local::lib;
 use File::Copy;
 use File::Path;
+use File::Util;
 use autodie;
 use Carp;
 
@@ -109,6 +110,15 @@ sub upgrade_to_environment {
     File::Path::mkpath($args{directory} . '/bin');
 
     copy($activate_script, $args{directory} . '/bin/activate');
+
+    my $file = File::Util->new();
+    my $activate_file = $file->load_file($args{directory}.'/bin/activate');
+    $activate_file =~ s/__PERL_ENV__/$args{directory}/g;
+
+    $file->write_file(
+        file => $args{directory}.'/bin/activate',
+        content => $activate_file
+    );
 
 } # end of subroutine upgrade_to_environment
 

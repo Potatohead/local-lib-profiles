@@ -11,6 +11,7 @@ my $builder = Module::Build->new(
         'local::lib' => 0,
         'autodie' => 0,
         'Params::Validate' => 0,
+        'File::Util' => 0,
     },
     build_requires => {
         'Test::More' => 0,
