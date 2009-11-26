@@ -69,6 +69,12 @@ function local-lib_rmenv () {
     env_dir="$LOCAL_LIB_HOME/$env_name"
 
     # check here if its the active environment somehow
+    if [ "$PERL_ENV" = "$env_dir" ]
+    then
+        echo "ERROR: You cannot remove the active environment ('$env_name')." >&2
+        echo "Either switch to another environment, or run 'deactivate'." >&2
+        return 1
+    fi
     
     rm -rf "$env_dir"
 }
