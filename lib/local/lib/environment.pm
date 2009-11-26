@@ -109,14 +109,14 @@ sub upgrade_to_environment {
 
     File::Path::mkpath($args{directory} . '/bin');
 
-    copy($activate_script, $args{directory} . '/bin/activate');
+    copy($activate_script, $args{directory} . '/bin/local-lib_activate');
 
     my $file = File::Util->new();
-    my $activate_file = $file->load_file($args{directory}.'/bin/activate');
+    my $activate_file = $file->load_file($args{directory}.'/bin/local-lib_activate');
     $activate_file =~ s/__PERL_ENV__/$args{directory}/g;
 
     $file->write_file(
-        file => $args{directory}.'/bin/activate',
+        file => $args{directory}.'/bin/local-lib_activate',
         content => $activate_file
     );
 

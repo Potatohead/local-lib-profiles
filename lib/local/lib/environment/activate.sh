@@ -1,7 +1,7 @@
 # This file must be used with "source bin/activate" *from bash*
 # you cannot run it directly
 
-deactivate () {
+local-lib_deactivate () {
     if [ -n "$_OLD_PATH" ] ; then
         PATH="$_OLD_PATH"
         export PATH
@@ -39,7 +39,7 @@ deactivate () {
     unset PERL_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
-        unset deactivate
+        unset local-lib_deactivate
     fi
 }
 
