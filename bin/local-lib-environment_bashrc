@@ -19,7 +19,7 @@ LOCAL_LIB_HOME=$(sh -c 'cd "$LOCAL_LIB_HOME"; pwd')
 export LOCAL_LIB_HOME
 
 # Verify that the local lib home exists
-function local-lib_verify_home () {
+function ll_verify_home () {
     if [ ! -d "$LOCAL_LIB_HOME" ]
     then
         echo "ERROR: local lib environments directory '$LOCAL_LIB_HOME' does not exist." >&2
@@ -29,7 +29,7 @@ function local-lib_verify_home () {
 }
 
 # Verify that the named environment in the local lib home exists
-function local-lib_verify_home_environment () {
+function ll_verify_home_environment () {
     typeset env_name="$1"
     if [ ! -d "$LOCAL_LIB_HOME/$env_name" ]
     then
@@ -40,7 +40,7 @@ function local-lib_verify_home_environment () {
 }
 
 # Verify that the active environment exists
-function local-lib_verify_active_environment () {
+function ll_verify_active_environment () {
     if [ ! -n "${PERL_ENV}" ] || [ ! -d "${PERL_ENV}" ]
     then
         echo "ERROR: no environment active, or active environment is missing" >&2
@@ -50,14 +50,14 @@ function local-lib_verify_active_environment () {
 }
 
 #changes directory to the currently active environment
-function local-lib_cdenv () {
-    local-lib_verify_active_environment || return 1
+function ll_cdenv () {
+    ll_verify_active_environment || return 1
     cd $PERL_ENV/$1
 }
 
 # List the available environments.
-function local-lib_show_workon_options () {
-    local-lib_verify_home  || return 1
+function ll_show_workon_options () {
+    ll_verify_home  || return 1
     # NOTE: DO NOT use ls here because colorized versions spew control characters
     #       into the output list.
     # echo seems a little faster than find, even with -depth 3.
@@ -65,23 +65,42 @@ function local-lib_show_workon_options () {
 }
 
 # Create a new environment in local lib home
-function local-lib_mkenv () {
+function ll_mkenv () {
     eval "envname=\$$#"
-    local-lib_verify_home || return 1
+    ll_verify_home || return 1
     perl -e "use local::lib::environment; local::lib::environment::make_environment(directory => '$LOCAL_LIB_HOME/$envname');"
 }
 
+# Run a hook script in the current shell
+function ll_source_hook () {
+    scriptname="$1"
+    if [ -f "$scriptname" ]
+    then
+        source "$scriptname"
+    fi
+}
+
+# Run a hook script in its own shell
+function ll_run_hook () {
+    scriptname="$1"
+    shift
+    if [ -x "$scriptname" ]
+    then
+        "$scriptname" "$@"
+    fi
+}
+
 # Remove an existing environment from local lib home
-function local-lib_rmenv () {
+function ll_rmenv () {
     typeset env_name="$1"
-    local-lib_verify_home || return 1
+    ll_verify_home || return 1
     if [ "$env_name"  = "" ]
     then
         echo "Please specify an environment." >&2
         return 1
     fi
     
-    local-lib_verify_home_environment $env_name || return 1
+    ll_verify_home_environment $env_name || return 1
     env_dir="$LOCAL_LIB_HOME/$env_name"
 
     # check here if its the active environment somehow
@@ -97,7 +116,7 @@ function local-lib_rmenv () {
 
 # takes an existing local-lib or local-lib-environment and upgrades its support
 # scripts
-function local-lib_upgrade_env () {
+function ll_upgrade_env () {
     typeset env_dir="$1"
 
     if [ ! -d "${env_dir}" ]
@@ -106,24 +125,24 @@ function local-lib_upgrade_env () {
         return 1
     fi
 
-    local-lib_verify_home || return 1
+    ll_verify_home || return 1
     perl -e "use local::lib::environment; local::lib::environment::upgrade_environment(directory => '$env_dir');"
 }
 
 # Activate a named environment
-function local-lib_workon () {
+function ll_workon () {
     typeset env_name="$1"
     if [ "$env_name" = "" ]
     then
         # Return the list of available environments
-        local-lib_show_workon_options
+        ll_show_workon_options
         return 1
     fi
 
-    local-lib_verify_home || return 1
-    local-lib_verify_home_environment || return 1
+    ll_verify_home || return 1
+    ll_verify_home_environment || return 1
 
-    activate="$LOCAL_LIB_HOME/$env_name/bin/local-lib_activate"
+    activate="$LOCAL_LIB_HOME/$env_name/bin/ll_activate"
 
     if [ ! -f "$activate" ]
     then
@@ -134,32 +153,60 @@ function local-lib_workon () {
     # Deactivate any current environment "destructively"
     # before switching so we use our override function,
     # if it exists.
-    type local-lib_deactivate >/dev/null 2>&1
+    type ll_deactivate >/dev/null 2>&1
     if [ $? -eq 0 ]
     then
-        local-lib_deactivate
+        ll_deactivate
     fi
     
     source "$activate"
+
+    # Save the deactivate function from virtualenv
+    ll_saved_deactivate=$(typeset -f ll_deactivate)
+
+    # Replace the deactivate() function with a wrapper.
+    eval 'function ll_deactivate () {
+        # Call the local hook before the global so we can undo
+        # any settings made by the local postactivate first.
+        ll_source_hook "$PERL_ENV/bin/ll_predeactivate"
+        ll_source_hook "$LOCAL_LIB_HOME/ll_predeactivate"
+        
+        env_postdeactivate_hook="$PERL_ENV/bin/ll_postdeactivate"
+        
+        # Restore the original definition of deactivate
+        eval "$ll_saved_deactivate"
+
+        # Instead of recursing, this calls the now restored original function.
+        ll_deactivate
+
+        ll_source_hook "$env_postdeactivate_hook"
+        ll_source_hook "$LOCAL_LIB_HOME/ll_postdeactivate"
+    }'
+    
+    ll_source_hook "$LOCAL_LIB_HOME/ll_postactivate"
+
+    ll_source_hook "$PERL_ENV/bin/ll_postactivate"    
+    
+	return 0
 }
 
 if [ -n "$BASH" ] ; then
     _perlenvs ()
     {
         local cur="${COMP_WORDS[COMP_CWORD]}"
-        COMPREPLY=( $(compgen -W "`local-lib_show_workon_options`" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "`ll_show_workon_options`" -- ${cur}) )
     }
 
     _cdperlenv_complete ()
     {
         local cur="$2"
         # COMPREPLY=( $(compgen -d -- "${VIRTUAL_ENV}/${cur}" | sed -e "s@${VIRTUAL_ENV}/@@" ) )
-        COMPREPLY=( $(local-lib_cdenv && compgen -d -- "${cur}" ) )
+        COMPREPLY=( $(ll_cdenv && compgen -d -- "${cur}" ) )
     }
-    complete -o nospace -F _cdperlenv_complete -S/ local-lib_cdenv
-    complete -o default -o nospace -F _perlenvs local-lib_workon
-    complete -o default -o nospace -F _perlenvs local-lib_rmenv
+    complete -o nospace -F _cdperlenv_complete -S/ ll_cdenv
+    complete -o default -o nospace -F _perlenvs ll_workon
+    complete -o default -o nospace -F _perlenvs ll_rmenv
 elif [ -n "$ZSH_VERSION" ] ; then
-    compctl -g "`local-lib_show_workon_options`" workon rmvirtualenv
+    compctl -g "`ll_show_workon_options`" workon rmvirtualenv
 fi
 

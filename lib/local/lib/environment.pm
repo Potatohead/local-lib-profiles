@@ -44,27 +44,27 @@ These are the cmd line usages for the package
 
 =cut
 
-=head2 local-lib_mkenv
+=head2 ll_mkenv
 
 This will create an environment under the LOCAL_LIB_HOME directory by the given
 name.
 
 =cut
 
-=head2 local-lib_rmenv
+=head2 ll_rmenv
 
 This will remove an environment that lives under the LOCAL_LIB_HOME directory 
 by the given name.
 
 =cut
 
-=head2 local-lib_workon
+=head2 ll_workon
 
 This will activate a previously created environment.
 
 =cut
 
-=head2 local-lib_deactivate
+=head2 ll_deactivate
 
 This will deactivate the currently active environment. Note that this is only
 available if an environment is active
@@ -147,7 +147,7 @@ sub upgrade_environment {
 
     deploy_support_file(
         source => $activate_script,
-        destination => $args{directory}.'/bin/local-lib_activate',
+        destination => $args{directory}.'/bin/ll_activate',
         environment_location => $args{directory}
     )
 
@@ -177,6 +177,11 @@ sub deploy_support_file {
             }
         }
     );
+
+    # File::Util cannot handle // in its file paths, so gotta replace them
+
+    $args{source} =~ s/\/\//\//g;
+    $args{destination} =~ s/\/\//\//g;
 
     #open the source of the file
     my $file = File::Util->new();
