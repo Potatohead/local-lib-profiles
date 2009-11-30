@@ -39,6 +39,22 @@ function local-lib_verify_home_environment () {
     return 0
 }
 
+# Verify that the active environment exists
+function local-lib_verify_active_environment () {
+    if [ ! -n "${PERL_ENV}" ] || [ ! -d "${PERL_ENV}" ]
+    then
+        echo "ERROR: no environment active, or active environment is missing" >&2
+        return 1
+    fi
+    return 0
+}
+
+#changes directory to the currently active environment
+function local-lib_cdenv () {
+    local-lib_verify_active_environment || return 1
+    cd $PERL_ENV/$1
+}
+
 # List the available environments.
 function local-lib_show_workon_options () {
     local-lib_verify_home  || return 1
@@ -111,4 +127,24 @@ function local-lib_workon () {
     
     source "$activate"
 }
+
+if [ -n "$BASH" ] ; then
+    _perlenvs ()
+    {
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        COMPREPLY=( $(compgen -W "`local-lib_show_workon_options`" -- ${cur}) )
+    }
+
+    _cdperlenv_complete ()
+    {
+        local cur="$2"
+        # COMPREPLY=( $(compgen -d -- "${VIRTUAL_ENV}/${cur}" | sed -e "s@${VIRTUAL_ENV}/@@" ) )
+        COMPREPLY=( $(local-lib_cdenv && compgen -d -- "${cur}" ) )
+    }
+    complete -o nospace -F _cdperlenv_complete -S/ local-lib_cdenv
+    complete -o default -o nospace -F _perlenvs local-lib_workon
+    complete -o default -o nospace -F _perlenvs local-lib_rmenv
+elif [ -n "$ZSH_VERSION" ] ; then
+    compctl -g "`local-lib_show_workon_options`" workon rmvirtualenv
+fi
 
