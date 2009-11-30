@@ -94,7 +94,7 @@ sub make_environment {
     local::lib->ensure_dir_structure_for($args{directory});
 
     # then upgrade it to a local lib environment
-    upgrade_to_environment(directory => $args{directory});
+    upgrade_environment(directory => $args{directory});
 
 } # end of subroutine make_environment
 
@@ -126,13 +126,13 @@ sub find_activate_script {
 } # end of subroutine find_activate_script
 
 
-=head2 upgrade_to_environment
+=head2 upgrade_environment
 
 Upgrades a local lib directory into a full environment
 
 =cut
 
-sub upgrade_to_environment {
+sub upgrade_environment {
     my %args = validate(@_,
         {
             directory => {
@@ -145,18 +145,54 @@ sub upgrade_to_environment {
 
     File::Path::mkpath($args{directory} . '/bin');
 
-    copy($activate_script, $args{directory} . '/bin/local-lib_activate');
+    deploy_support_file(
+        source => $activate_script,
+        destination => $args{directory}.'/bin/local-lib_activate',
+        environment_location => $args{directory}
+    )
 
-    my $file = File::Util->new();
-    my $activate_file = $file->load_file($args{directory}.'/bin/local-lib_activate');
-    $activate_file =~ s/__PERL_ENV__/$args{directory}/g;
+} # end of subroutine upgrade_environment
 
-    $file->write_file(
-        file => $args{directory}.'/bin/local-lib_activate',
-        content => $activate_file
+
+
+=head2 deploy_support_file
+
+takes a support file from a given local (like lib/activate.sh or the templates
+directory), substitutes the content tokens that it finds, then writes the file
+to the required destination
+
+=cut
+
+sub deploy_support_file {
+    my %args = validate(@_,
+        {
+            source => {
+                type => SCALAR
+            },
+            destination => {
+                type => SCALAR
+            },
+            environment_location => {
+                type => SCALAR
+            }
+        }
     );
 
-} # end of subroutine upgrade_to_environment
+    #open the source of the file
+    my $file = File::Util->new();
+    my $support_file = $file->load_file($args{source});
+
+    #substitute the tokens
+    $support_file =~ s/__PERL_ENV__/$args{environment_location}/g;
+
+    #write to its destination
+    $file->write_file(
+        file => $args{destination},
+        content => $support_file
+    );
+
+} # end of subroutine deploy_support_file
+
 
 
 =head1 AUTHOR
@@ -196,6 +232,6 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of local::lib::environment
+# End of local::lib::environment
 
 

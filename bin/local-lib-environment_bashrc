@@ -68,7 +68,7 @@ function local-lib_show_workon_options () {
 function local-lib_mkenv () {
     eval "envname=\$$#"
     local-lib_verify_home || return 1
-    perl -e "use local::lib::environment; print local::lib::environment::make_environment(directory => '$LOCAL_LIB_HOME/$envname');"
+    perl -e "use local::lib::environment; local::lib::environment::make_environment(directory => '$LOCAL_LIB_HOME/$envname');"
 }
 
 # Remove an existing environment from local lib home
@@ -93,6 +93,21 @@ function local-lib_rmenv () {
     fi
     
     rm -rf "$env_dir"
+}
+
+# takes an existing local-lib or local-lib-environment and upgrades its support
+# scripts
+function local-lib_upgrade_env () {
+    typeset env_dir="$1"
+
+    if [ ! -d "${env_dir}" ]
+    then
+        echo "ERROR: the environment directory does not exist" >&2
+        return 1
+    fi
+
+    local-lib_verify_home || return 1
+    perl -e "use local::lib::environment; local::lib::environment::upgrade_environment(directory => '$env_dir');"
 }
 
 # Activate a named environment
