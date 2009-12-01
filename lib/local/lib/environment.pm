@@ -215,7 +215,9 @@ perldoc local::lib::environment
 =head1 ACKNOWLEDGEMENTS
 
 This code is largely modeled upon, and in places copied from, work by Doug 
-Hellmann in his virtualenvwrapper package
+Hellmann in his virtualenvwrapper python package
+
+=head1 COPYRIGHT & LICENSE
 
 Copyright Doug Hellmann, All Rights Reserved
 
@@ -226,8 +228,6 @@ both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Doug Hellmann not be used
 in advertising or publicity pertaining to distribution of the software
 without specific, written prior permission.
-
-=head1 COPYRIGHT & LICENSE
 
 Copyright 2009 Christopher Mckay.
 
