@@ -42,34 +42,35 @@ environments.
 
 These are the cmd line usages for the package
 
-=cut
-
 =head2 ll_mkenv
 
-This will create an environment under the LOCAL_LIB_HOME directory by the given
+Creates an environment under the LOCAL_LIB_HOME directory by the given
 name.
-
-=cut
 
 =head2 ll_rmenv
 
-This will remove an environment that lives under the LOCAL_LIB_HOME directory 
+Removes an environment that lives under the LOCAL_LIB_HOME directory 
 by the given name.
-
-=cut
 
 =head2 ll_workon
 
-This will activate a previously created environment.
-
-=cut
+Activates a previously created environment.
 
 =head2 ll_deactivate
 
-This will deactivate the currently active environment. Note that this is only
+Deactivate the currently active environment. Note that this is only
 available if an environment is active
 
-=cut
+=head2 ll_upgrade_env
+
+Replaces or create the Active scripts in a given local-lib environment.
+This can be used to either turn a local-lib library into a full blown
+environment or to take an existing environment and upgrade it to contain more
+recent scripts
+
+=head2 ll_cdenv
+
+Changes directory into the root of the environment
 
 =head1 ROUTINES
 
@@ -213,8 +214,8 @@ perldoc local::lib::environment
 
 =head1 ACKNOWLEDGEMENTS
 
-
-=head1 COPYRIGHT & LICENSE
+This code is largely modeled upon, and in places copied from, work by Doug 
+Hellmann in his virtualenvwrapper package
 
 Copyright Doug Hellmann, All Rights Reserved
 
@@ -225,6 +226,8 @@ both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Doug Hellmann not be used
 in advertising or publicity pertaining to distribution of the software
 without specific, written prior permission.
+
+=head1 COPYRIGHT & LICENSE
 
 Copyright 2009 Christopher Mckay.
 
