@@ -154,7 +154,7 @@ function ll_workon () {
     fi
 
     ll_verify_home || return 1
-    ll_verify_home_environment || return 1
+    ll_verify_home_environment $env_name || return 1
 
     activate="$LOCAL_LIB_HOME/$env_name/bin/ll_activate"
 
