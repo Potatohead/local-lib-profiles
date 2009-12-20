@@ -72,7 +72,7 @@ function ll_show_workon_options () {
 # Create a new environment in local lib home
 function ll_mkenv () {
     eval "envname=\$$#"
-    if [ "$env_name" = "" ]
+    if [ "$envname" = "" ]
     then
         echo "Please specify an enviroment name." >&2
         return 1
