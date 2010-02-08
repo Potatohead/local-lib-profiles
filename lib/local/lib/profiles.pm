@@ -1,4 +1,4 @@
-package local::lib::environment;
+package local::lib::profiles;
 
 use strict;
 use warnings;
@@ -13,15 +13,15 @@ use Carp;
 
 =head1 NAME
 
-local::lib::environment - makes modules feel at home
+local::lib::profiles - makes modules feel at home
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -32,9 +32,9 @@ describe the module, working code example
 
 =head1 DESCRIPTION
 
-local::lib::environment is designed to extend upon the methodologies of
+local::lib::profiles is designed to extend upon the methodologies of
 lib::local to make it simpler to create, manage, and discard local perl
-environments. 
+profiles.
 
 =cut
 
@@ -42,47 +42,47 @@ environments.
 
 These are the cmd line usages for the package
 
-=head2 ll_mkenv
+=head2 ll_mkprofile
 
-Creates an environment under the LOCAL_LIB_HOME directory by the given
+Creates a profile under the LOCAL_LIB_HOME directory by the given
 name.
 
-=head2 ll_rmenv
+=head2 ll_rmprofile
 
-Removes an environment that lives under the LOCAL_LIB_HOME directory 
+Removes a profile that lives under the LOCAL_LIB_HOME directory 
 by the given name.
 
 =head2 ll_workon
 
-Activates a previously created environment.
+Activates a previously created profile.
 
 =head2 ll_deactivate
 
-Deactivate the currently active environment. Note that this is only
-available if an environment is active
+Deactivate the currently active profile. Note that this is only
+available if an profile is active
 
-=head2 ll_upgrade_env
+=head2 ll_upgrade_profile
 
-Replaces or create the Active scripts in a given local-lib environment.
+Replaces or create the Active scripts in a given local-lib profile.
 This can be used to either turn a local-lib library into a full blown
-environment or to take an existing environment and upgrade it to contain more
+profile or to take an existing profile and upgrade it to contain more
 recent scripts
 
-=head2 ll_cdenv
+=head2 ll_cdprofile
 
-Changes directory into the root of the environment
+Changes directory into the root of the profile
 
 =head1 ROUTINES
 
 =cut
 
-=head2 make_environment
+=head2 make_profile
 
-Creates a new local lib environment in the supplied directory
+Creates a new local lib profile in the supplied directory
 
 =cut
 
-sub make_environment {
+sub make_profile {
     my %args = validate(@_,
         {
             directory => {
@@ -94,10 +94,10 @@ sub make_environment {
     # create base local lib
     local::lib->ensure_dir_structure_for($args{directory});
 
-    # then upgrade it to a local lib environment
-    upgrade_environment(directory => $args{directory});
+    # then upgrade it to a local lib profile
+    upgrade_profile(directory => $args{directory});
 
-} # end of subroutine make_environment
+} # end of subroutine make_profile
 
 
 =head2 find_activate_script
@@ -117,9 +117,9 @@ sub find_activate_script {
 
     foreach (@lib_paths)
     {
-        if (-e $_.'/local/lib/environment/activate.sh')
+        if (-e $_.'/local/lib/profiles/activate.sh')
         {
-            return $_.'/local/lib/environment/activate.sh';
+            return $_.'/local/lib/profiles/activate.sh';
         }
     }
 
@@ -127,13 +127,13 @@ sub find_activate_script {
 } # end of subroutine find_activate_script
 
 
-=head2 upgrade_environment
+=head2 upgrade_profile
 
-Upgrades a local lib directory into a full environment
+Upgrades a local lib directory into a full profile
 
 =cut
 
-sub upgrade_environment {
+sub upgrade_profile {
     my %args = validate(@_,
         {
             directory => {
@@ -149,10 +149,10 @@ sub upgrade_environment {
     deploy_support_file(
         source => $activate_script,
         destination => $args{directory}.'/bin/ll_activate',
-        environment_location => $args{directory}
+        profile_location => $args{directory}
     )
 
-} # end of subroutine upgrade_environment
+} # end of subroutine upgrade_profile
 
 
 
@@ -173,7 +173,7 @@ sub deploy_support_file {
             destination => {
                 type => SCALAR
             },
-            environment_location => {
+            profile_location => {
                 type => SCALAR
             }
         }
@@ -189,7 +189,7 @@ sub deploy_support_file {
     my $support_file = $file->load_file($args{source});
 
     #substitute the tokens
-    $support_file =~ s/__PERL_ENV__/$args{environment_location}/g;
+    $support_file =~ s/__PERL_PROFILE__/$args{profile_location}/g;
 
     #write to its destination
     $file->write_file(
@@ -209,7 +209,7 @@ Christopher Mckay (cmckay), C<< <potatohead@potatolan.com> >>
 
 You can find documentation for this module with the perldoc command.
 
-perldoc local::lib::environment
+perldoc local::lib::profiles
 
 
 =head1 ACKNOWLEDGEMENTS
@@ -240,6 +240,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-# End of local::lib::environment
-
-
+# End of local::lib::profiles

@@ -1,11 +1,11 @@
-bin/local-lib-environment_bashrc
+bin/local-lib-profile_bashrc
 Build.PL
 Changes
 ignore.txt
-lib/local/lib/environment.pm
-lib/local/lib/environment/activate.sh
+lib/local/lib/profiles.pm
+lib/local/lib/profiles/activate.sh
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 META.yml
 README
 t/00-load.t

@@ -48,7 +48,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/local/lib/environment.pm');
+  module_boilerplate_ok('lib/local/lib/profiles.pm');
 
 
 }

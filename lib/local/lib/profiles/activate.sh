@@ -36,7 +36,7 @@ ll_deactivate () {
         unset _OLD_PS1
     fi
 
-    unset PERL_ENV
+    unset PERL_PROFILE
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
         unset -f ll_deactivate
@@ -46,18 +46,18 @@ ll_deactivate () {
 # unset irrelavent variables
 ll_deactivate nondestructive
 
-PERL_ENV="__PERL_ENV__"
-export PERL_ENV
+PERL_PROFILE="__PERL_PROFILE__"
+export PERL_PROFILE
 
 _OLD_PATH="$PATH"
 
 _OLD_PS1="$PS1"
-if [ "`basename \"$PERL_ENV\"`" = "__" ] ; then
+if [ "`basename \"$PERL_PROFILE\"`" = "__" ] ; then
     # special case for Aspen magic directories
     # see http://www.zetadev.com/software/aspen/
-    PS1="[`basename \`dirname \"$PERL_ENV\"\``] $PS1"
+    PS1="[`basename \`dirname \"$PERL_PROFILE\"\``] $PS1"
 else
-    PS1="(`basename \"$PERL_ENV\"`)$PS1"
+    PS1="(`basename \"$PERL_PROFILE\"`)$PS1"
 fi
 export PS1
 
@@ -69,7 +69,7 @@ _OLD_PERL5LIB="$PERL5LIB"
 export _OLD_PERL5LIB
 
 
-eval $( perl -Mlocal::lib=$PERL_ENV)
+eval $( perl -Mlocal::lib=$PERL_PROFILE)
 
 # This should detect bash and zsh, which have a hash command that must
 # be called to get it to forget past commands.  Without forgetting

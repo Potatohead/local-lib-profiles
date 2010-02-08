@@ -1,26 +1,22 @@
 ---
-name: local-lib-environment
-version: 0.01
+abstract: 'makes modules feel at home'
 author:
   - 'Christopher Mckay <potatohead@potatolan.com>'
-abstract: module catchphrase
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
   Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: local-lib-profiles
 requires:
   File::Util: 0
   Params::Validate: 0
   autodie: 0
   local::lib: 0
-configure_requires:
-  Module::Build: 0.35
-provides:
-  local::lib::environment:
-    file: lib/local/lib/environment.pm
-    version: 0.01
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

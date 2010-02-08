@@ -3,10 +3,10 @@ use warnings;
 use Module::Build;
 
 my $builder = Module::Build->new(
-    module_name         => 'local::lib::environment',
+    module_name         => 'local::lib::profiles',
     license             => 'perl',
     dist_author         => q{Christopher Mckay <potatohead@potatolan.com>},
-    dist_version_from   => 'lib/local/lib/environment.pm',
+    dist_version_from   => 'lib/local/lib/profiles.pm',
     requires => {
         'local::lib' => 0,
         'autodie' => 0,
@@ -16,7 +16,7 @@ my $builder = Module::Build->new(
     build_requires => {
         'Test::More' => 0,
     },
-    add_to_cleanup      => [ 'local-lib-environment-*' ],
+    add_to_cleanup      => [ 'local-lib-profiles-*' ],
     create_makefile_pl => 'traditional',
 );
 

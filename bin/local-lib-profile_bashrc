@@ -1,0 +1,226 @@
+#TODO
+# - Going to have to look at the possibility of putting the current active
+#   profiles names somewhere which opens up the possibility of deactivating
+#   and lets me stop people from deleting active profiles and activating
+#   something twice. Can also get it into the prompt somehow
+# - existence of .modulebuildrc in a directory means its an profile
+
+
+# Make sure there is a default value for WORKON_HOME.
+# You can override this setting in your .bashrc.
+if [ "$LOCAL_LIB_HOME" = "" ]
+then
+    export LOCAL_LIB_HOME="$HOME/.perl-profiles"
+fi
+
+# Normalize the directory name in case it includes 
+# relative path components.
+LOCAL_LIB_HOME=$(sh -c 'cd "$LOCAL_LIB_HOME"; pwd')
+export LOCAL_LIB_HOME
+
+# Verify that the local lib home exists
+function ll_verify_home () {
+    if [ ! -d "$LOCAL_LIB_HOME" ]
+    then
+        echo "ERROR: local lib profiles directory '$LOCAL_LIB_HOME' does not exist." >&2
+        return 1
+    fi
+    return 0
+}
+
+# Verify that the named profile in the local lib home exists
+function ll_verify_home_profile () {
+    typeset profile_name="$1"
+    if [ "$profile_name" = "" ]
+    then
+        echo "Please specify an profile." >&2
+        return 1
+    fi
+    if [ ! -d "$LOCAL_LIB_HOME/$profile_name" ]
+    then
+        echo "ERROR: profile '$profile_name' does not exist." >&2
+        return 1
+    fi
+    return 0
+}
+
+# Verify that the active profile exists
+function ll_verify_active_profile () {
+    if [ ! -n "${PERL_PROFILE}" ] || [ ! -d "${PERL_PROFILE}" ]
+    then
+        echo "ERROR: no profile active, or active profile is missing" >&2
+        return 1
+    fi
+    return 0
+}
+
+#changes directory to the currently active profile
+function ll_cdprofile () {
+    ll_verify_active_profile || return 1
+    cd $PERL_PROFILE/$1
+}
+
+# List the available profiles.
+function ll_show_workon_options () {
+    ll_verify_home  || return 1
+    # NOTE: DO NOT use ls here because colorized versions spew control characters
+    #       into the output list.
+    # echo seems a little faster than find, even with -depth 3.
+    (cd "$LOCAL_LIB_HOME"; for f in */.modulebuildrc; do echo $f; done) | sed 's|^\./||' | sed 's|/.modulebuildrc||' | sort
+}
+
+# Create a new profile in local lib home
+function ll_mkprofile () {
+    eval "profile_name=\$$#"
+    if [ "$profile_name" = "" ]
+    then
+        echo "Please specify an profile name." >&2
+        return 1
+    fi
+    ll_verify_home || return 1
+    perl -e "use local::lib::profiles; local::lib::profiles::make_profile(directory => '$LOCAL_LIB_HOME/$profile_name');"
+}
+
+# Run a hook script in the current shell
+function ll_source_hook () {
+    scriptname="$1"
+    if [ -f "$scriptname" ]
+    then
+        source "$scriptname"
+    fi
+}
+
+# Run a hook script in its own shell
+function ll_run_hook () {
+    scriptname="$1"
+    shift
+    if [ -x "$scriptname" ]
+    then
+        "$scriptname" "$@"
+    fi
+}
+
+# Remove an existing profile from local lib home
+function ll_rmprofile () {
+    typeset profile_name="$1"
+    ll_verify_home || return 1
+    if [ "$profile_name"  = "" ]
+    then
+        echo "Please specify an profile." >&2
+        return 1
+    fi
+    
+    ll_verify_home_profile $profile_name || return 1
+    profile_dir="$LOCAL_LIB_HOME/$profile_name"
+
+    # check here if its the active profile somehow
+    if [ "$PERL_PROFILE" = "$profile_dir" ]
+    then
+        echo "ERROR: You cannot remove the active profile ('$profile_name')." >&2
+        echo "Either switch to another profile, or run 'deactivate'." >&2
+        return 1
+    fi
+    
+    rm -rf "$profile_dir"
+}
+
+# takes an existing local-lib or local-lib-profile and upgrades its support
+# scripts
+function ll_upgrade_profile () {
+    typeset profile_dir="$1"
+    if [ "$profile_dir" = "" ]
+    then
+        echo "Please specify a profile directory." >&2
+        return 1
+    fi
+    if [ ! -d "${profile_dir}" ]
+    then
+        echo "ERROR: the profile directory does not exist" >&2
+        return 1
+    fi
+
+    ll_verify_home || return 1
+    perl -e "use local::lib::profiles; local::lib::profiles::upgrade_profile(directory => '$profile_dir');"
+}
+
+# Activate a named profile
+function ll_workon () {
+    typeset profile_name="$1"
+    if [ "$profile_name" = "" ]
+    then
+        # Return the list of available profiles
+        ll_show_workon_options
+        return 1
+    fi
+
+    ll_verify_home || return 1
+    ll_verify_home_profile $profile_name || return 1
+
+    activate="$LOCAL_LIB_HOME/$profile_name/bin/ll_activate"
+
+    if [ ! -f "$activate" ]
+    then
+        echo "ERROR: profile '$WORKON_HOME/$profile_name' does not contain an activate script." >&2
+        return 1
+    fi
+
+    # Deactivate any current profile "destructively"
+    # before switching so we use our override function,
+    # if it exists.
+    type ll_deactivate >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+        ll_deactivate
+    fi
+    
+    source "$activate"
+
+    # Save the deactivate function from l::l::p
+    ll_saved_deactivate=$(typeset -f ll_deactivate)
+
+    # Replace the deactivate() function with a wrapper.
+    eval 'function ll_deactivate () {
+        # Call the local hook before the global so we can undo
+        # any settings made by the local postactivate first.
+        ll_source_hook "$PERL_PROFILE/bin/ll_predeactivate"
+        ll_source_hook "$LOCAL_LIB_HOME/ll_predeactivate"
+        
+        profile_postdeactivate_hook="$PERL_PROFILE/bin/ll_postdeactivate"
+        
+        # Restore the original definition of deactivate
+        eval "$ll_saved_deactivate"
+
+        # Instead of recursing, this calls the now restored original function.
+        ll_deactivate
+
+        ll_source_hook "$profile_postdeactivate_hook"
+        ll_source_hook "$LOCAL_LIB_HOME/ll_postdeactivate"
+    }'
+    
+    ll_source_hook "$LOCAL_LIB_HOME/ll_postactivate"
+
+    ll_source_hook "$PERL_PROFILE/bin/ll_postactivate"    
+    
+	return 0
+}
+
+if [ -n "$BASH" ] ; then
+    _perlprofiles ()
+    {
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        COMPREPLY=( $(compgen -W "`ll_show_workon_options`" -- ${cur}) )
+    }
+
+    _cdperlprofile_complete ()
+    {
+        local cur="$2"
+        # COMPREPLY=( $(compgen -d -- "${VIRTUAL_ENV}/${cur}" | sed -e "s@${VIRTUAL_ENV}/@@" ) )
+        COMPREPLY=( $(ll_cdprofile && compgen -d -- "${cur}" ) )
+    }
+    complete -o nospace -F _cdperlprofile_complete -S/ ll_cdprofile
+    complete -o default -o nospace -F _perlprofiles ll_workon
+    complete -o default -o nospace -F _perlprofiles ll_rmprofile
+elif [ -n "$ZSH_VERSION" ] ; then
+    compctl -g "`ll_show_workon_options`" ll_workon ll_rmprofile
+fi
+

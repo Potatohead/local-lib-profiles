@@ -1,5 +1,7 @@
-Revision history for local-lib-environment
+Revision history for local-lib-profiles
 
+0.02    2010-02-08/10:37
+        Refactored into local-lib-profiles
 0.01    Date/time
         First version, released on an unsuspecting world.
 
