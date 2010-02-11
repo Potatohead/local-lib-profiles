@@ -1,5 +1,7 @@
 Revision history for local-lib-profiles
 
+0.03    2010-02-12/08:51
+        Cleaned up for release
 0.02    2010-02-08/10:37
         Refactored into local-lib-profiles
 0.01    Date/time
