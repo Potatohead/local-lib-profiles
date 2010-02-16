@@ -17,11 +17,11 @@ local::lib::profiles - makes modules feel at home
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -203,6 +203,10 @@ sub deploy_support_file {
 
 =head1 AUTHOR
 
+Please contribute patches to Github:
+
+    http://github.com/Potatohead/local-lib-profiles
+
 Christopher Mckay (cmckay), C<< <potatohead@potatolan.com> >>
 
 =head1 SUPPORT
@@ -211,6 +215,15 @@ You can find documentation for this module with the perldoc command.
 
 perldoc local::lib::profiles
 
+=head1 BUGS
+
+=over 4
+
+=item Colons in profile names
+
+This breaks the profile creation, just don't do it untill I fix it.
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 
