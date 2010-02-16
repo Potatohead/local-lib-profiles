@@ -12,6 +12,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: local-lib-profiles
+provides:
+  local::lib::profiles:
+    file: lib/local/lib/profiles.pm
+    version: 0.02
 requires:
   File::Util: 0
   Params::Validate: 0

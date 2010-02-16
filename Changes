@@ -1,5 +1,8 @@
 Revision history for local-lib-profiles
 
+0.03    2010-02-16/21:38
+        Moved the bash import script from name local-lib-profile_bashrc to
+        local-lib-profiles_bashrc to be in line with the module name
 0.02    2010-02-08/10:37
         Refactored into local-lib-profiles
 0.01    Date/time

@@ -5,15 +5,15 @@ WriteMakefile
           'NAME' => 'local::lib::profiles',
           'VERSION_FROM' => 'lib/local/lib/profiles.pm',
           'PREREQ_PM' => {
-                           'File::Util' => '0',
-                           'Params::Validate' => '0',
-                           'Test::More' => '0',
-                           'autodie' => '0',
-                           'local::lib' => '0'
+                           'File::Util' => 0,
+                           'Params::Validate' => 0,
+                           'Test::More' => 0,
+                           'autodie' => 0,
+                           'local::lib' => 0
                          },
           'INSTALLDIRS' => 'site',
           'EXE_FILES' => [
-                           'bin/local-lib-profile_bashrc'
+                           'bin/local-lib-profiles_bashrc'
                          ],
           'PL_FILES' => {}
         )
