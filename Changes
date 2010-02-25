@@ -1,5 +1,8 @@
 Revision history for local-lib-profiles
 
+0.05    2010-02-26/18:07
+        Removed the activate script from its location in libs to a variable in
+        the perl code to be injected into a file when a profile is beig created.
 0.04    2010-02-16/21:38
         Moved the bash import script from name local-lib-profile_bashrc to
         local-lib-profiles_bashrc to be in line with the module name

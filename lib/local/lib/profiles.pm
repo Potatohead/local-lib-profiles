@@ -17,11 +17,11 @@ local::lib::profiles - makes modules feel at home
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -37,6 +37,91 @@ lib::local to make it simpler to create, manage, and discard local perl
 profiles.
 
 =cut
+
+# Embedding the activate script in a value to be written to a file
+# all values in it are escaped so to edit s/\\\$/\$/g and reverse to store back
+# the way it's escaped
+my $activate_script = <<ACT_HD
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+ll_deactivate () {
+    if [ -n "\$_OLD_PATH" ] ; then
+        PATH="\$_OLD_PATH"
+        export PATH
+        unset _OLD_PATH
+    fi
+    if [ -n "\$_OLD_MODULEBUILDRC" ] ; then
+        MODULEBUILDRC="\$_OLD_MODULEBUILDRC"
+        export MODULEBUILDRC
+        unset _OLD_MODULEBUILDRC
+    fi
+    if [ -n "\$_OLD_PERL_MM_OPT" ] ; then
+        PERL_MM_OPT="\$_OLD_PERL_MM_OPT"
+        export PERL_MM_OPT
+        unset _OLD_PERL_MM_OPT
+    fi
+    if [ -n "\$_OLD_PERL5LIB" ] ; then
+        PERL5LIB="\$_OLD_PERL5LIB"
+        export PERL5LIB
+        unset _OLD_PERL5LIB
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the \$PATH changes we made may not be respected
+    if [ -n "\$BASH" -o -n "\$ZSH_VERSION" ] ; then
+        hash -r
+    fi
+
+    if [ -n "\$_OLD_PS1" ] ; then
+        PS1="\$_OLD_PS1"
+        export PS1
+        unset _OLD_PS1
+    fi
+
+    unset PERL_PROFILE
+    if [ ! "\$1" = "nondestructive" ] ; then
+    # Self destruct!
+        unset -f ll_deactivate
+    fi
+}
+
+# unset irrelavent variables
+ll_deactivate nondestructive
+
+PERL_PROFILE="__PERL_PROFILE__"
+export PERL_PROFILE
+
+_OLD_PATH="\$PATH"
+
+_OLD_PS1="\$PS1"
+if [ "`basename \"\$PERL_PROFILE\"`" = "__" ] ; then
+    # special case for Aspen magic directories
+    # see http://www.zetadev.com/software/aspen/
+    PS1="[`basename \`dirname \"\$PERL_PROFILE\"\``] \$PS1"
+else
+    PS1="(`basename \"\$PERL_PROFILE\"`)\$PS1"
+fi
+export PS1
+
+_OLD_MODULEBUILDRC="\$MODULEBUILDRC"
+export _OLD_MODULEBUILDRC
+_OLD_PERL_MM_OPT="\$PERL_MM_OPT"
+export _OLD_PERL_MM_OPT
+_OLD_PERL5LIB="\$PERL5LIB"
+export _OLD_PERL5LIB
+
+
+eval \$( perl -Mlocal::lib=\$PERL_PROFILE)
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the \$PATH changes we made may not be respected
+if [ -n "\$BASH" -o -n "\$ZSH_VERSION" ] ; then
+    hash -r
+fi
+ACT_HD
 
 =head1 COMMANDS
 
@@ -100,33 +185,6 @@ sub make_profile {
 } # end of subroutine make_profile
 
 
-=head2 find_activate_script
-
-Finds the path of the activate.sh script
-
-=cut
-
-sub find_activate_script {
-    my %args = validate(@_,
-        {
-
-        }
-    );
-
-    my @lib_paths = split /:/, $ENV{PERL5LIB};
-
-    foreach (@lib_paths)
-    {
-        if (-e $_.'/local/lib/profiles/activate.sh')
-        {
-            return $_.'/local/lib/profiles/activate.sh';
-        }
-    }
-
-    die "No activate.sh script found in library paths";
-} # end of subroutine find_activate_script
-
-
 =head2 upgrade_profile
 
 Upgrades a local lib directory into a full profile
@@ -141,8 +199,6 @@ sub upgrade_profile {
             }
         }
     );
-
-    my $activate_script = find_activate_script();
 
     File::Path::mkpath($args{directory} . '/bin');
 
