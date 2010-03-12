@@ -41,7 +41,7 @@ profiles.
 # Embedding the activate script in a value to be written to a file
 # all values in it are escaped so to edit s/\\\$/\$/g and reverse to store back
 # the way it's escaped
-my $activate_script = <<ACT_HD
+my $activate_script = <<ACT_HD;
 # This file must be used with "source bin/activate" *from bash*
 # you cannot run it directly
 
