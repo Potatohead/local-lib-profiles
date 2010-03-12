@@ -236,21 +236,17 @@ sub deploy_support_file {
     );
 
     # File::Util cannot handle // in its file paths, so gotta replace them
-
-    $args{source} =~ s/\/\//\//g;
     $args{destination} =~ s/\/\//\//g;
 
-    #open the source of the file
     my $file = File::Util->new();
-    my $support_file = $file->load_file($args{source});
 
     #substitute the tokens
-    $support_file =~ s/__PERL_PROFILE__/$args{profile_location}/g;
+    $args{source} =~ s/__PERL_PROFILE__/$args{profile_location}/g;
 
     #write to its destination
     $file->write_file(
         file => $args{destination},
-        content => $support_file
+        content => $args{source}
     );
 
 } # end of subroutine deploy_support_file
